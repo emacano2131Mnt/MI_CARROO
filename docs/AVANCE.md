@@ -46,6 +46,22 @@ Escanea el QR de Expo con Expo Go compatible con SDK 57 o abre un emulador Andro
 - Requisitos RF-01 a RF-40 fuera de las cinco áreas de este avance.
 - Revisar los avisos de seguridad reportados por npm durante la instalación antes de preparar una entrega final.
 
+## Actualización — formulario y validaciones de vehículos
+
+- El formulario usa selectores locales para subtipo, marca y modelo. Las marcas se filtran por clase general (carro/motocicleta); los modelos se filtran por marca y subtipo y pueden buscarse. Tipo, marca y modelo no aceptan texto libre. La línea/versión se conserva como campo separado.
+- El catálogo está en `src/constants/vehicle-catalog.ts`, funciona sin red y contiene una selección curada/no exhaustiva de modelos consultados en sitios oficiales e importadores. Las fuentes, fecha de consulta y límites históricos están en `docs/FUENTES_CATALOGO_VEHICULOS.md`.
+- Kilometraje inicial y lecturas aceptan enteros de 0 a 9.999.999; el cilindraje es opcional y acepta enteros positivos hasta 99.999 cc. Los campos filtran pegados y caracteres inválidos; la capa SQLite vuelve a validar.
+- La placa se normaliza a mayúsculas y sin espacios; carro usa 3 letras + 3 números y moto 3 letras + 2 números, con una letra final adicional conforme a la Resolución 4923 de 1994 cuando aplique. La consulta normativa y sus fuentes se documentan junto al catálogo. SQLite conserva la unicidad al crear y editar.
+- La migración añade clase general/subtipo e identificadores de catálogo sin cambiar campos de identidad existentes. Los datos antiguos fuera del catálogo permanecen visibles y pueden guardarse sin alterar tipo, marca, modelo o placa. Se muestran como referencias históricas y no se ofrecen para nuevos registros.
+- El tema central ahora usa texto principal y secundario de alto contraste en ambos modos, superficies de selector adaptadas al tema y colores legibles para campos, error, selección y navegación. La preferencia claro/oscuro/automático sigue almacenándose en el proveedor existente.
+- Navegación móvil y web muestran emojis centrados encima de las etiquetas y conservan las seis rutas existentes.
+- `tests/vehicle-rules.test.ts` cubre límites numéricos, catálogos/compatibilidad, placas, datos antiguos, migración SQLite, contraste de paletas y metadatos/rutas de navegación.
+- Verificación de esta entrega: `npm test` (23/23), `npx tsc --noEmit`, `npm run lint` y `npx expo-doctor` (resultado registrado al finalizar). No se ejecutó en Expo Go, emulador o dispositivo; por ello siguen pendientes las comprobaciones visuales/táctiles descritas abajo.
+
+### Comprobación manual pendiente
+
+En Expo Go abre **Vehículos** con el tema claro y luego con el oscuro. Abre cada selector y cancélalo para confirmar que no cambia el formulario; busca marcas/modelos y cambia tipo y marca para verificar que se limpia un modelo incompatible. Pega un kilometraje de 8 dígitos, un cilindraje de 6 dígitos y placas con letras/números en posiciones incorrectas: los valores deben cortarse, mostrar el error y no guardarse hasta corregirlos. Prueba `ABC123`, `ABC12` y `ABC12D`, además de intentar repetir la placa de otro vehículo y editar el propio sin duplicarlo. Edita un registro antiguo fuera del catálogo sin cambiar su identidad y confirma que sigue mostrándose. Verifica que emojis estén encima de etiquetas en las seis pestañas, que éstas no se recorten y que Ajustes conserve el tema elegido tras cerrar y reabrir la app.
+
 ## Actualización — operaciones de mantenimiento e historial
 
 - El plan permite eliminar una actividad con confirmación cuando no tiene servicios vinculados. La capa SQLite comprueba el historial dentro de una transacción y rechaza el borrado si hay registros asociados.

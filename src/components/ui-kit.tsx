@@ -8,7 +8,7 @@ import { isValidISODate } from '@/utils/business-rules';
 
 export function useUiColors() {
   const c = useThemeColors();
-  return useMemo(() => ({ ink: c.text, green: c.primary, pale: c.paleBlue, muted: c.muted, line: c.border, white: c.white, red: c.danger, navy: c.navy, teal: c.teal, background: c.background, onNavy: c.onNavy, onNavyAccent: c.onNavyAccent }), [c]);
+  return useMemo(() => ({ ink: c.text, green: c.primary, pale: c.paleBlue, muted: c.muted, line: c.border, white: c.white, surface: c.surface, red: c.danger, navy: c.navy, teal: c.teal, background: c.background, onNavy: c.onNavy, onNavyAccent: c.onNavyAccent }), [c]);
 }
 
 export function useUiStyles() {
@@ -24,7 +24,7 @@ export function useUiStyles() {
     sectionTitle: { fontSize: 18, fontWeight: '700', color: c.navy },
     sectionDetail: { color: c.muted, fontSize: 13 },
     card: { backgroundColor: c.surface, borderRadius: 18, borderWidth: 1, borderColor: c.border, padding: 16, gap: 11, shadowColor: c.shadow, shadowOpacity: 0.06, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 2 },
-    heroCard: { backgroundColor: c.navy, borderColor: c.navy, padding: 19 },
+    heroCard: { backgroundColor: c.heroSurface, borderColor: c.heroSurface, padding: 19 },
     softCard: { backgroundColor: c.surfaceSecondary, borderColor: c.border },
     metricCard: { flex: 1, minWidth: 88, borderRadius: 16, padding: 13, gap: 4, borderWidth: 1 },
     metricBlue: { backgroundColor: c.paleBlue, borderColor: c.border },
@@ -54,7 +54,7 @@ export function useUiStyles() {
     secondaryText: { color: c.primary },
     dangerText: { color: c.danger },
     body: { color: c.muted, fontSize: 14, lineHeight: 21 },
-    pressed: { opacity: 0.76, transform: [{ scale: 0.985 }] },
+    pressed: { borderColor: c.primaryDark, transform: [{ scale: 0.985 }] },
   }), [c]);
 }
 
@@ -124,13 +124,14 @@ export function Label({ children }: { children: string }) {
   return <Text style={styles.label}>{children}</Text>;
 }
 
-export function Field({ label, value, onChangeText, placeholder, keyboardType = 'default', required = false, autoCapitalize = 'sentences' }: {
+export function Field({ label, value, onChangeText, placeholder, keyboardType = 'default', required = false, autoCapitalize = 'sentences', error, editable = true }: {
   label: string; value: string; onChangeText: (value: string) => void; placeholder?: string;
   keyboardType?: 'default' | 'numeric' | 'decimal-pad'; required?: boolean; autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
+  error?: string; editable?: boolean;
 }) {
   const styles = useUiStyles();
   const colors = useThemeColors();
-  return <View style={styles.field}><Text style={styles.label}>{label}{required ? <Text style={styles.required}> *</Text> : null}</Text><TextInput accessibilityLabel={label} value={value} onChangeText={onChangeText} placeholder={placeholder} keyboardType={keyboardType} autoCapitalize={autoCapitalize} style={styles.input} placeholderTextColor={colors.placeholder} selectionColor={colors.primary} /></View>;
+  return <View style={styles.field}><Text style={styles.label}>{label}{required ? <Text style={styles.required}> *</Text> : null}</Text><TextInput accessibilityLabel={label} value={value} onChangeText={onChangeText} placeholder={placeholder} keyboardType={keyboardType} autoCapitalize={autoCapitalize} editable={editable} style={[styles.input, !editable && { backgroundColor: colors.surfaceSecondary, color: colors.muted }, error && { borderColor: colors.danger }]} placeholderTextColor={colors.placeholder} selectionColor={colors.primary} />{error ? <Text style={{ color: colors.danger, fontSize: 12, lineHeight: 17 }}>{error}</Text> : null}</View>;
 }
 
 export function Button({ title, onPress, secondary = false, compact = false, danger = false }: { title: string; onPress: () => void; secondary?: boolean; compact?: boolean; danger?: boolean }) {

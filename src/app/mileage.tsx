@@ -3,6 +3,7 @@ import { Alert, Text, View } from 'react-native';
 
 import { addReading, listReadings, listVehicles, Vehicle } from '@/database/database';
 import { Body, Button, Card, EmptyState, Field, MetricCard, Screen, SectionTitle, Title, useUiColors, errorMessage, isValidDate, message } from '@/components/ui-kit';
+import { isValidOdometer, sanitizeIntegerInput } from '@/utils/vehicle-rules';
 
 export default function Mileage() {
   const colors = useUiColors();
@@ -12,6 +13,7 @@ export default function Mileage() {
   const [readings, setReadings] = useState<{ id: number; date: string; mileage: number }[]>([]);
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [mileage, setMileage] = useState('');
+  const [mileageError, setMileageError] = useState<string>();
   const selectedVehicle = vehicles.find(vehicle => vehicle.id === selected);
 
   const load = useCallback(async () => {
@@ -34,7 +36,7 @@ export default function Mileage() {
       const value = Number(mileage);
       if (!selected) throw new Error('Registra o selecciona un vehículo primero.');
       if (!isValidDate(date)) throw new Error('Usa una fecha válida con formato AAAA-MM-DD.');
-      if (!Number.isInteger(value) || value < 0) throw new Error('El kilometraje debe ser un número entero no negativo.');
+      if (!isValidOdometer(mileage)) throw new Error('El kilometraje debe ser un entero de hasta 7 dígitos (máximo 9.999.999 km).');
       const previous = readings[0]?.mileage ?? selectedVehicle?.mileage ?? 0;
       if (value < previous && !confirmed) {
         Alert.alert('Lectura menor a la anterior', `La última lectura fue ${previous.toLocaleString()} km. ¿Confirmas guardar ${value.toLocaleString()} km?`, [
@@ -47,6 +49,7 @@ export default function Mileage() {
       setReadings(await listReadings(selected));
       setVehicles(await listVehicles(false));
       setMileage('');
+      setMileageError(undefined);
       message('Lectura guardada', 'El odómetro actual y los estados de mantenimiento se actualizaron.');
     } catch (error) {
       message('No se pudo guardar', errorMessage(error));
@@ -74,7 +77,7 @@ export default function Mileage() {
           <Card>
             <SectionTitle detail="Confirma si la lectura es menor a la registrada">Nueva lectura</SectionTitle>
             <Field label="Fecha de lectura (AAAA-MM-DD)" value={date} onChangeText={setDate} required />
-            <Field label="Odómetro (km)" value={mileage} onChangeText={setMileage} keyboardType="numeric" required />
+            <Field label="Odómetro (km)" value={mileage} onChangeText={raw => { const result = sanitizeIntegerInput(raw, 7); setMileage(result.value); setMileageError(result.exceedsLimit ? 'Máximo 7 dígitos (9.999.999 km).' : result.hasInvalidCharacters ? 'Usa solo números enteros.' : undefined); }} keyboardType="numeric" required error={mileageError} placeholder="0 a 9.999.999" />
             <Button title="Guardar lectura" onPress={()=>void save()} />
           </Card>
 

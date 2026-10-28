@@ -1,5 +1,7 @@
 import { Tabs } from 'expo-router';
 
+import { TabLabel } from '@/components/tab-label';
+import { tabItems } from '@/constants/tab-items';
 import { useThemeColors } from '@/hooks/theme-context';
 
 export default function AppTabsWeb() {
@@ -11,11 +13,13 @@ export default function AppTabsWeb() {
         tabBarIcon: () => null,
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.muted,
-        tabBarLabelStyle: { fontSize: 11, fontWeight: '700', marginTop: 2 },
+        tabBarLabelStyle: { margin: 0 },
+        tabBarItemStyle: { paddingHorizontal: 0, paddingTop: 2 },
         tabBarStyle: {
           backgroundColor: colors.tabBar,
           borderTopColor: colors.border,
-          paddingTop: 7,
+          borderTopWidth: 1,
+          paddingTop: 4,
           maxWidth: 800,
           alignSelf: 'center',
           width: '100%',
@@ -23,12 +27,17 @@ export default function AppTabsWeb() {
         tabBarHideOnKeyboard: true,
       }}
     >
-      <Tabs.Screen name="index" options={{ title: 'Inicio', tabBarLabel: '🏠 Inicio', tabBarAccessibilityLabel: 'Inicio' }} />
-      <Tabs.Screen name="vehicles" options={{ title: 'Vehículos', tabBarLabel: '🚗 Autos', tabBarAccessibilityLabel: 'Vehículos' }} />
-      <Tabs.Screen name="mileage" options={{ title: 'Kilometraje', tabBarLabel: '🛣️ Km', tabBarAccessibilityLabel: 'Kilometraje' }} />
-      <Tabs.Screen name="maintenance" options={{ title: 'Mantenimiento', tabBarLabel: '🛠️ Plan', tabBarAccessibilityLabel: 'Plan de mantenimiento' }} />
-      <Tabs.Screen name="history" options={{ title: 'Historial', tabBarLabel: '📋 Historial', tabBarAccessibilityLabel: 'Historial de servicios' }} />
-      <Tabs.Screen name="settings" options={{ title: 'Ajustes', tabBarLabel: '⚙️ Ajustes', tabBarAccessibilityLabel: 'Ajustes de apariencia' }} />
+      {tabItems.map(item => (
+        <Tabs.Screen
+          key={item.route}
+          name={item.route}
+          options={{
+            title: item.title,
+            tabBarAccessibilityLabel: item.title,
+            tabBarLabel: ({ color, focused }) => <TabLabel emoji={item.emoji} label={item.label} color={color} focused={focused} />,
+          }}
+        />
+      ))}
       <Tabs.Screen name="explore" options={{ href: null }} />
     </Tabs>
   );

@@ -39,7 +39,7 @@ export default function Settings() {
                 accessibilityState={{ checked: selected }}
                 accessibilityLabel={`${option.title}. ${option.detail}`}
                 onPress={() => void setPreference(option.value).catch(() => Alert.alert('No se pudo guardar', 'Revisa el almacenamiento disponible e inténtalo de nuevo.'))}
-                style={({ pressed }) => [styles.option, selected && styles.optionSelected, pressed && { opacity: 0.78 }]}
+                style={({ pressed }) => [styles.option, selected && styles.optionSelected, pressed && { borderColor: colors.primaryDark, transform: [{ scale: 0.99 }] }]}
               >
                 <Text style={styles.icon} accessibilityElementsHidden>{option.icon}</Text>
                 <View style={styles.copy}>
