@@ -1,3 +1,5 @@
+import { StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Tabs } from 'expo-router';
 
 import { TabLabel } from '@/components/tab-label';
@@ -6,20 +8,25 @@ import { useThemeColors } from '@/hooks/theme-context';
 
 export default function AppTabsWeb() {
   const colors = useThemeColors();
+  const insets = useSafeAreaInsets();
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
+        tabBarShowLabel: true,
         tabBarIcon: () => null,
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.muted,
-        tabBarLabelStyle: { margin: 0 },
-        tabBarItemStyle: { paddingHorizontal: 0, paddingTop: 2 },
+        tabBarLabelStyle: { margin: 0, flex: 1, fontSize: 10 },
+        tabBarItemStyle: { flex: 1, minWidth: 0, paddingHorizontal: 1, paddingVertical: 2 },
         tabBarStyle: {
           backgroundColor: colors.tabBar,
           borderTopColor: colors.border,
-          borderTopWidth: 1,
-          paddingTop: 4,
+          borderTopWidth: StyleSheet.hairlineWidth,
+          paddingTop: 3,
+          height: 62 + insets.bottom,
+          // Expo Router's tab bar already adds the device bottom inset and paints it with this background.
+          // Do not add a second SafeAreaView or bottom padding here.
           maxWidth: 800,
           alignSelf: 'center',
           width: '100%',
@@ -34,7 +41,7 @@ export default function AppTabsWeb() {
           options={{
             title: item.title,
             tabBarAccessibilityLabel: item.title,
-            tabBarLabel: ({ color, focused }) => <TabLabel emoji={item.emoji} label={item.label} color={color} focused={focused} />,
+            tabBarLabel: ({ color, focused }) => <TabLabel emoji={item.emoji} label={item.label} color={focused ? colors.tabActive : colors.muted} focused={focused} activeBackground={colors.tabActiveBackground} />,
           }}
         />
       ))}

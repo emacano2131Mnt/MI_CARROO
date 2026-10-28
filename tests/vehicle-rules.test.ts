@@ -139,6 +139,8 @@ test('colores principales del tema oscuro mantienen contraste WCAG AA', () => {
   assert.ok(contrastRatio(dark.primary, dark.selected) >= 4.5);
   assert.ok(contrastRatio(dark.danger, dark.paleDanger) >= 4.5);
   assert.ok(contrastRatio(dark.onNavy, dark.heroSurface) >= 4.5);
+  assert.ok(contrastRatio(dark.tabActive, dark.tabActiveBackground) >= 4.5);
+  assert.ok(contrastRatio(dark.muted, dark.tabBar) >= 4.5);
 });
 
 test('tema claro conserva contraste de texto y controles principales', () => {
@@ -148,11 +150,14 @@ test('tema claro conserva contraste de texto y controles principales', () => {
   assert.ok(contrastRatio(light.muted, light.surface) >= 4.5);
   assert.ok(contrastRatio(light.primary, light.surface) >= 4.5);
   assert.ok(contrastRatio(light.onPrimary, light.primary) >= 4.5);
+  assert.ok(contrastRatio(light.tabActive, light.tabActiveBackground) >= 4.5);
+  assert.ok(contrastRatio(light.muted, light.tabBar) >= 4.5);
 });
 
 test('navegación separa emoji y etiqueta y solo declara rutas existentes', () => {
   const expectedRoutes = ['index', 'vehicles', 'mileage', 'maintenance', 'history', 'settings'];
   assert.deepEqual(tabItems.map(item => item.route), expectedRoutes);
   assert.ok(tabItems.every(item => item.emoji.length > 0 && item.label.length > 0 && !item.label.includes(item.emoji)));
-  assert.deepEqual(tabItems.map(item => item.emoji), ['🏠', '🚗', '🛣️', '🛠️', '📋', '⚙️']);
+  assert.deepEqual(tabItems.map(item => item.label), ['Inicio', 'Vehículos', 'Kilometraje', 'Mantenimiento', 'Historial', 'Configuración']);
+  assert.deepEqual(tabItems.map(item => item.emoji), ['🏠', '🚗', '🧭', '🛠️', '📋', '⚙️']);
 });

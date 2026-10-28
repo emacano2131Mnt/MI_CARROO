@@ -1,17 +1,21 @@
-import { StyleSheet, Text, View, type ColorValue } from 'react-native';
+import { StyleSheet, Text, View, useWindowDimensions, type ColorValue } from 'react-native';
 
-export function TabLabel({ emoji, label, color, focused }: { emoji: string; label: string; color: ColorValue; focused: boolean }) {
+export function TabLabel({ emoji, label, color, focused, activeBackground }: { emoji: string; label: string; color: ColorValue; focused: boolean; activeBackground: ColorValue }) {
+  const { width } = useWindowDimensions();
+  const compactLabel = width < 468 && (label === 'Mantenimiento' || label === 'Configuración')
+    ? label === 'Mantenimiento' ? 'Manteni\nmiento' : 'Configu\nración'
+    : label;
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, focused && { backgroundColor: activeBackground }]}>
       <Text accessibilityElementsHidden style={styles.emoji}>{emoji}</Text>
-      <Text numberOfLines={1} style={[styles.label, { color }, focused && styles.active]}>{label}</Text>
+      <Text numberOfLines={2} style={[styles.label, { color }, focused && styles.active]}>{compactLabel}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { alignItems: 'center', justifyContent: 'center', minWidth: 48, gap: 1 },
-  emoji: { fontSize: 21, lineHeight: 24, textAlign: 'center' },
-  label: { fontSize: 9, lineHeight: 12, fontWeight: '600', textAlign: 'center' },
+  container: { alignItems: 'center', justifyContent: 'center', width: '100%', minWidth: 0, gap: 2, paddingVertical: 2, borderRadius: 12 },
+  emoji: { fontSize: 24, lineHeight: 26, textAlign: 'center' },
+  label: { width: '100%', fontSize: 10, lineHeight: 12, fontWeight: '600', textAlign: 'center' },
   active: { fontWeight: '800' },
 });
