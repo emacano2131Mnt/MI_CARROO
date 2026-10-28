@@ -45,3 +45,13 @@ Escanea el QR de Expo con Expo Go compatible con SDK 57 o abre un emulador Andro
 - Permitir configuración de categorías desde una pantalla propia y más filtros del historial.
 - Requisitos RF-01 a RF-40 fuera de las cinco áreas de este avance.
 - Revisar los avisos de seguridad reportados por npm durante la instalación antes de preparar una entrega final.
+
+## Actualización — operaciones de mantenimiento e historial
+
+- El plan permite eliminar una actividad con confirmación cuando no tiene servicios vinculados. La capa SQLite comprueba el historial dentro de una transacción y rechaza el borrado si hay registros asociados.
+- El historial permite seleccionar vehículos activos y archivados, consultar solo sus servicios en orden cronológico, editar un registro sin duplicarlo y eliminarlo con confirmación.
+- Las operaciones de servicios guardan trazabilidad de cómo el servicio actualizó el odómetro y los próximos vencimientos. Al editar o eliminar un servicio nuevo, recalculan esos datos en una transacción y mantienen la integridad referencial.
+- Se agregó migración aditiva para guardar esa trazabilidad. Los registros previos a la migración que no tienen procedencia reconstruible quedan protegidos: el sistema bloquea su borrado y los cambios de odómetro/vínculo que podrían alterar datos existentes. Las actividades con servicios no permiten editar fecha/km/periodicidad; sus campos descriptivos permanecen editables.
+- No hay sistema de notificaciones locales/remotas en el proyecto, así que no existe una notificación pendiente de cancelar al borrar actividad.
+- `tests/database-operations.test.ts` prueba con SQLite en memoria la eliminación permitida/rechazada de actividades, edición sin duplicados, eliminación y recálculo, filtrado/orden del historial, inclusión de vehículos archivados y bloqueo seguro de datos antiguos.
+- Verificación de esta entrega: `npm test` (9/9), `npx tsc --noEmit`, `npm run lint` y `npx expo-doctor`. Las pruebas de interfaz de confirmación y selección en un dispositivo siguen pendientes.

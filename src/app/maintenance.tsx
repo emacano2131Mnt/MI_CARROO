@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
-import { Text, View } from 'react-native';
-import { Activity, listActivities, listVehicles, saveActivity, toggleActivity, Vehicle } from '@/database/database';
+import { Alert, Text, View } from 'react-native';
+import { Activity, deleteActivity, listActivities, listVehicles, saveActivity, toggleActivity, Vehicle } from '@/database/database';
 import { Body, Button, Card, EmptyState, Field, Screen, SectionTitle, StatusBadge, Title, useUiColors, errorMessage, isValidDate, message } from '@/components/ui-kit';
 import { activityStatus } from '@/utils/business-rules';
 const categories=['Aceite','Filtros','Frenos','Llantas','Batería','Refrigeración','Suspensión','Transmisión','Otros'];
@@ -9,6 +9,7 @@ export default function Maintenance(){const colors=useUiColors();const styles=ma
  const load=useCallback(async()=>{const [v,a]=await Promise.all([listVehicles(false),listActivities()]);setVehicles(v);setActivities(a);if(!vehicleId&&v[0])setVehicleId(v[0].id);},[vehicleId]);const set=(k:keyof typeof blank,value:string)=>setForm(f=>({...f,[k]:value}));
  const edit=(a:Activity)=>{setEditing(a.id);setVehicleId(a.vehicle_id);setForm({name:a.name,category:a.category,description:a.description,due_date:a.due_date??'',due_mileage:a.due_mileage==null?'':String(a.due_mileage),advance_days:String(a.advance_days),advance_km:String(a.advance_km),period_days:a.period_days==null?'':String(a.period_days),period_km:a.period_km==null?'':String(a.period_km)});};
  const save=async()=>{try{if(!vehicleId)throw new Error('Registra un vehículo primero.');if(!form.name.trim())throw new Error('El nombre de la actividad es obligatorio.');const km=form.due_mileage?Number(form.due_mileage):null;const due=form.due_date||null;const advanceDays=Number(form.advance_days),advanceKm=Number(form.advance_km),periodDays=form.period_days?Number(form.period_days):null,periodKm=form.period_km?Number(form.period_km):null;if(!due&&km===null)throw new Error('Indica un vencimiento por fecha, kilometraje o ambos.');if(due&&!isValidDate(due))throw new Error('La fecha debe ser válida y tener formato AAAA-MM-DD.');if(km!==null&&(!Number.isInteger(km)||km<0))throw new Error('El kilometraje límite debe ser no negativo.');if(!Number.isInteger(advanceDays)||advanceDays<0||!Number.isInteger(advanceKm)||advanceKm<0)throw new Error('Los márgenes de anticipación deben ser enteros no negativos.');if((periodDays!==null&&(!Number.isInteger(periodDays)||periodDays<=0))||(periodKm!==null&&(!Number.isInteger(periodKm)||periodKm<=0)))throw new Error('La periodicidad debe ser un entero mayor a cero.');await saveActivity({id:editing,vehicle_id:vehicleId,name:form.name.trim(),category:form.category,description:form.description,due_date:due,due_mileage:km,advance_days:advanceDays,advance_km:advanceKm,period_days:periodDays,period_km:periodKm});setEditing(undefined);setForm(blank);await load();message('Actividad guardada','El plan se recalculó y quedó guardado.');}catch(e){message('No se pudo guardar',errorMessage(e));}};
+ const remove=(activity:Activity)=>Alert.alert('Eliminar actividad',`¿Deseas eliminar “${activity.name}”? Solo se puede borrar si no tiene servicios asociados.`,[{text:'Cancelar',style:'cancel'},{text:'Eliminar',style:'destructive',onPress:()=>void (async()=>{try{await deleteActivity(activity.id);if(editing===activity.id){setEditing(undefined);setForm(blank);}await load();message('Actividad eliminada','La actividad se quitó del plan.');}catch(error){message('No se pudo eliminar',errorMessage(error));}})()}]);
  const today=new Date().toISOString().slice(0,10);const status=(a:Activity&{mileage:number})=>activityStatus(a,today);
  return (
   <Screen load={load}>
@@ -53,6 +54,7 @@ export default function Maintenance(){const colors=useUiColors();const styles=ma
      <View style={styles.actionRow}>
       <Button compact secondary title="Editar" onPress={()=>edit(a)}/>
       <Button compact secondary title={a.paused?'Reactivar':'Pausar'} onPress={async()=>{await toggleActivity(a.id,a.paused?0:1);await load();}}/>
+      <Button compact danger title="Eliminar" onPress={()=>remove(a)}/>
      </View>
     </Card>
    ))}
