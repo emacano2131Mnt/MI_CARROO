@@ -139,7 +139,7 @@ test('colores principales del tema oscuro mantienen contraste WCAG AA', () => {
   assert.ok(contrastRatio(dark.primary, dark.selected) >= 4.5);
   assert.ok(contrastRatio(dark.danger, dark.paleDanger) >= 4.5);
   assert.ok(contrastRatio(dark.onNavy, dark.heroSurface) >= 4.5);
-  assert.ok(contrastRatio(dark.tabActive, dark.tabActiveBackground) >= 4.5);
+  assert.ok(contrastRatio(dark.tabActive, dark.tabBar) >= 4.5);
   assert.ok(contrastRatio(dark.muted, dark.tabBar) >= 4.5);
 });
 
@@ -150,7 +150,7 @@ test('tema claro conserva contraste de texto y controles principales', () => {
   assert.ok(contrastRatio(light.muted, light.surface) >= 4.5);
   assert.ok(contrastRatio(light.primary, light.surface) >= 4.5);
   assert.ok(contrastRatio(light.onPrimary, light.primary) >= 4.5);
-  assert.ok(contrastRatio(light.tabActive, light.tabActiveBackground) >= 4.5);
+  assert.ok(contrastRatio(light.tabActive, light.tabBar) >= 4.5);
   assert.ok(contrastRatio(light.muted, light.tabBar) >= 4.5);
 });
 

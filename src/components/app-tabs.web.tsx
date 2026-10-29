@@ -41,7 +41,7 @@ export default function AppTabsWeb() {
           options={{
             title: item.title,
             tabBarAccessibilityLabel: item.title,
-            tabBarLabel: ({ color, focused }) => <TabLabel emoji={item.emoji} label={item.label} color={focused ? colors.tabActive : colors.muted} focused={focused} activeBackground={colors.tabActiveBackground} />,
+            tabBarLabel: ({ color, focused }) => <TabLabel emoji={item.emoji} label={item.label} color={focused ? colors.tabActive : colors.muted} focused={focused} />,
           }}
         />
       ))}

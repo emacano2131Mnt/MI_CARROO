@@ -27,10 +27,10 @@ export default function AppTabs() {
           height: 62 + insets.bottom,
           // Expo Router's tab bar already adds the device bottom inset and paints it with this background.
           // Do not add a second SafeAreaView or bottom padding here.
-          elevation: 12,
+          elevation: 2,
           shadowColor: colors.shadow,
-          shadowOpacity: 0.08,
-          shadowRadius: 12,
+          shadowOpacity: 0.04,
+          shadowRadius: 4,
           shadowOffset: { width: 0, height: -4 },
         },
         tabBarHideOnKeyboard: true,
@@ -43,7 +43,7 @@ export default function AppTabs() {
           options={{
             title: item.title,
             tabBarAccessibilityLabel: item.title,
-            tabBarLabel: ({ color, focused }) => <TabLabel emoji={item.emoji} label={item.label} color={focused ? colors.tabActive : colors.muted} focused={focused} activeBackground={colors.tabActiveBackground} />,
+            tabBarLabel: ({ color, focused }) => <TabLabel emoji={item.emoji} label={item.label} color={focused ? colors.tabActive : colors.muted} focused={focused} />,
           }}
         />
       ))}
